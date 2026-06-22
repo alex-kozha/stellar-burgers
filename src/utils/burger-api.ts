@@ -15,6 +15,18 @@ type TRefreshResponse = TServerResponse<{
   accessToken: string;
 }>;
 
+console.log('🔍 BURGER_API_URL из .env:', process.env.BURGER_API_URL);
+
+console.log('🔍 URL после присвоения:', URL);
+
+// ✅ Если URL не определен, используй fallback:
+if (!URL) {
+  console.error(
+    '❌ BURGER_API_URL не определен в .env! Использую дефолтный URL'
+  );
+  // Для теста - захардкодь:
+  // const URL = 'https://norma.nomoreparties.space/api';
+}
 export const refreshToken = (): Promise<TRefreshResponse> =>
   fetch(`${URL}/auth/token`, {
     method: 'POST',
