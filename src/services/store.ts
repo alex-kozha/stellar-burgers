@@ -5,6 +5,7 @@ import userReducer from './slices/userSlice';
 import feedsReducer from './slices/feedSlices';
 import constructorReducer from './slices/constructorSlice';
 import orderReducer from './slices/orderSlice';
+import orderByNumberReducer from './slices/orderByNumberSlice';
 import {
   TypedUseSelectorHook,
   useDispatch as dispatchHook,
@@ -16,7 +17,8 @@ const rootReducer = {
   user: userReducer,
   feeds: feedsReducer,
   burgerConstructor: constructorReducer,
-  order: orderReducer
+  order: orderReducer,
+  orderByNumber: orderByNumberReducer
 };
 // Заменить на импорт настоящего редьюсера
 
@@ -31,6 +33,7 @@ export type RootState = {
   feeds: ReturnType<typeof feedsReducer>;
   burgerConstructor: ReturnType<typeof constructorReducer>;
   order: ReturnType<typeof orderReducer>;
+  orderByNumber: ReturnType<typeof orderByNumberReducer>;
 };
 
 export type AppDispatch = typeof store.dispatch;

@@ -5,26 +5,28 @@ import { TIngredient } from '@utils-types';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { getOrderByNumberApi } from '../../utils/burger-api';
-import { useSelector } from '../../services/store';
+import { useDispatch, useSelector } from '../../services/store';
+import {
+  fetchOrderByNumber,
+  clearOrderByNumber
+} from '../../services/slices/orderByNumberSlice';
 import { TOrder } from '@utils-types';
 
 export const OrderInfo: FC = () => {
   const { number } = useParams();
-  const [orderData, setOrderData] = useState<TOrder | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { order: orderData, isLoading } = useSelector(
+    (state) => state.orderByNumber
+  );
   const { ingredients } = useSelector((state) => state.ingredients);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (number) {
-      getOrderByNumberApi(Number(number))
-        .then((data) => {
-          setOrderData(data.orders[0]);
-          setIsLoading(false);
-        })
-        .catch(() => {
-          setIsLoading(false);
-        });
+      dispatch(fetchOrderByNumber(Number(number)));
     }
+    return () => {
+      dispatch(clearOrderByNumber());
+    };
   }, [number]);
 
   const orderInfo = useMemo(() => {

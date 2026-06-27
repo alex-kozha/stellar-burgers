@@ -14,6 +14,8 @@ export const Login: FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  const from = location.state?.from || '/';
+
   const handleSubmit = (e: SyntheticEvent) => {
     e.preventDefault();
     dispatch(loginUser({ email, password }))
@@ -23,7 +25,6 @@ export const Login: FC = () => {
       })
       .catch(() => {});
   };
-  const from = location.state?.from || '/';
 
   return (
     <LoginUI

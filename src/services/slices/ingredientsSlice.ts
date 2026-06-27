@@ -19,13 +19,13 @@ export const fetchIngredients = createAsyncThunk(
   'ingredients/fetchIngredients',
   async (_, { rejectWithValue }) => {
     try {
-      console.log('🔥 fetchIngredients: вызов API...');
       const data = await getIngredientsApi();
-      console.log('🔥 fetchIngredients: данные получены!', data);
       return data;
-    } catch (error: any) {
-      console.error('🔥 fetchIngredients: ОШИБКА!', error);
-      return rejectWithValue(error.message || 'Ошибка загрузки ингредиентов');
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        return rejectWithValue(error.message || 'Ошибка загрузки ингредиентов');
+      }
+      return rejectWithValue('Ошибка загрузки ингредиентов');
     }
   }
 );

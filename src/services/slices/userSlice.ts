@@ -90,7 +90,18 @@ const userSlice = createSlice({
         state.user = action.payload;
       })
       // Fetch user
+      .addCase(fetchUser.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchUser.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isAuthenticated = false;
+        state.user = null;
+        state.error = action.error.message || 'Ошибка загрузки пользователя';
+      })
       .addCase(fetchUser.fulfilled, (state, action) => {
+        state.isLoading = false;
         state.isAuthenticated = true;
         state.user = action.payload;
       })
@@ -98,6 +109,10 @@ const userSlice = createSlice({
       .addCase(logout.fulfilled, (state) => {
         state.isAuthenticated = false;
         state.user = null;
+      })
+      .addCase(updateUser.fulfilled, (state, action) => {
+        state.isAuthenticated = true;
+        state.user = action.payload;
       });
   }
 });

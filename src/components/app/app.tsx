@@ -11,22 +11,26 @@ import {
 } from '@pages';
 import '../../index.css';
 import styles from './app.module.css';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from '../../services/store';
 import { fetchUser } from '../../services/slices/userSlice';
 import { fetchIngredients } from '../../services/slices/ingredientsSlice';
 import { OrderInfo } from '@components';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { AppHeader } from '@components';
 import { Preloader } from '@ui';
 import { Modal } from '../modal/index';
 import { IngredientDetails } from '../ingredient-details/index';
-import { useNavigate, useParams } from 'react-router-dom';
+import {
+  useNavigate,
+  useParams,
+  useLocation,
+  Routes,
+  Route
+} from 'react-router-dom';
 import { ProtectedRoute } from '../../components/protected-route';
 
 const OrderModal = () => {
   const navigate = useNavigate();
-
   return (
     <Modal title='Детали заказа' onClose={() => navigate(-1)}>
       <OrderInfo />
@@ -34,11 +38,9 @@ const OrderModal = () => {
   );
 };
 
-// Компонент-обёртка для модалки ингредиента
 const IngredientModal = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-
   return (
     <Modal title='Детали ингредиента' onClose={() => navigate(-1)}>
       <IngredientDetails />
@@ -46,83 +48,11 @@ const IngredientModal = () => {
   );
 };
 
-const router = createBrowserRouter([
-  {
-    path: '/',
-    element: <ConstructorPage />
-  },
-  {
-    path: '/feed',
-    element: <Feed />
-  },
-  {
-    path: '/feed/:number',
-    element: <OrderModal />
-  },
-  {
-    path: '/ingredients/:id',
-    element: <IngredientModal />
-  },
-  {
-    path: '/login',
-    element: (
-      <ProtectedRoute onlyUnAuth>
-        <Login />
-      </ProtectedRoute>
-    )
-  },
-  {
-    path: '/register',
-    element: (
-      <ProtectedRoute onlyUnAuth>
-        <Register />
-      </ProtectedRoute>
-    )
-  },
-  {
-    path: '/forgot-password',
-    element: (
-      <ProtectedRoute onlyUnAuth>
-        <ForgotPassword />
-      </ProtectedRoute>
-    )
-  },
-  {
-    path: '/reset-password',
-    element: (
-      <ProtectedRoute onlyUnAuth>
-        <ResetPassword />
-      </ProtectedRoute>
-    )
-  },
-  {
-    path: '/profile',
-    element: (
-      <ProtectedRoute>
-        <Profile />
-      </ProtectedRoute>
-    )
-  },
-  {
-    path: '/profile/orders',
-    element: (
-      <ProtectedRoute>
-        <ProfileOrders />
-      </ProtectedRoute>
-    )
-  },
-  {
-    path: '/profile/orders/:number',
-    element: <OrderModal />
-  },
-  {
-    path: '*',
-    element: <NotFound404 />
-  }
-]);
-
 const App = () => {
   const dispatch = useDispatch();
+  const location = useLocation();
+  const background = location.state?.background;
+  const hasChecked = useRef(false);
 
   const {
     ingredients: ingredientsData,
@@ -140,10 +70,11 @@ const App = () => {
   }, [dispatch, ingredientsData.length, isIngredientsLoading]);
 
   useEffect(() => {
-    if (!isAuthenticated && !isUserLoading) {
+    if (!hasChecked.current) {
+      hasChecked.current = true;
       dispatch(fetchUser());
     }
-  }, [dispatch, isAuthenticated, isUserLoading]);
+  }, [dispatch]);
 
   if (isIngredientsLoading || isUserLoading) {
     return (
@@ -158,9 +89,7 @@ const App = () => {
     return (
       <div className={styles.app}>
         <AppHeader />
-        <div className={`${styles.error} text text_type_main-medium pt-4`}>
-          {error}
-        </div>
+        <div className={styles.error}>{error}</div>
       </div>
     );
   }
@@ -169,7 +98,75 @@ const App = () => {
     <div className={styles.app}>
       <AppHeader />
       {ingredientsData.length > 0 ? (
-        <RouterProvider router={router} />
+        <>
+          <Routes location={background || location}>
+            <Route path='/' element={<ConstructorPage />} />
+            <Route path='/feed' element={<Feed />} />
+            <Route path='/feed/:number' element={<OrderInfo />} />
+            <Route path='/ingredients/:id' element={<IngredientDetails />} />
+
+            <Route
+              path='/login'
+              element={
+                <ProtectedRoute onlyUnAuth>
+                  <Login />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path='/register'
+              element={
+                <ProtectedRoute onlyUnAuth>
+                  <Register />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path='/forgot-password'
+              element={
+                <ProtectedRoute onlyUnAuth>
+                  <ForgotPassword />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path='/reset-password'
+              element={
+                <ProtectedRoute onlyUnAuth>
+                  <ResetPassword />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path='/profile'
+              element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path='/profile/orders'
+              element={
+                <ProtectedRoute>
+                  <ProfileOrders />
+                </ProtectedRoute>
+              }
+            />
+            <Route path='/profile/orders/:number' element={<OrderInfo />} />
+
+            <Route path='*' element={<NotFound404 />} />
+          </Routes>
+
+          {background && (
+            <Routes>
+              <Route path='/feed/:number' element={<OrderModal />} />
+              <Route path='/ingredients/:id' element={<IngredientModal />} />
+              <Route path='/profile/orders/:number' element={<OrderModal />} />
+            </Routes>
+          )}
+        </>
       ) : (
         <div className={`${styles.title} text text_type_main-medium pt-4`}>
           Нет ингредиентов
