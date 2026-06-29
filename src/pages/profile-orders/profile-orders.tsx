@@ -9,11 +9,9 @@ export const ProfileOrders: FC = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    console.log('🔥🔥🔥 ProfileOrders: useEffect ВЫЗВАН!');
     dispatch(fetchUserOrders());
   }, [dispatch]);
   const { orders, isLoading } = useSelector((state) => state.feeds);
-  console.log('🔥 ProfileOrders: orders =', orders); // ← должен быть Array(12)
 
   if (isLoading && !orders.length) {
     return <Preloader />;

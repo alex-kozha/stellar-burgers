@@ -54,10 +54,6 @@ const feedsSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchUserOrders.fulfilled, (state, action) => {
-        console.log(
-          '🔥🔥🔥 fetchUserOrders.fulfilled: сохраняю заказы',
-          action.payload
-        );
         state.isLoading = false;
         state.orders = action.payload; // ← сохраняем заказы
         // total и totalToday не меняем (они для ленты)

@@ -20,15 +20,20 @@ const constructorSlice = createSlice({
   initialState,
   reducers: {
     // services/slices/constructorSlice.ts
-    addIngredient: (state, action: PayloadAction<TIngredient>) => {
-      if (action.payload.type === 'bun') {
-        state.bun = action.payload;
-      } else {
-        state.ingredients.push({
-          ...action.payload,
+    addIngredient: {
+      reducer: (state, action: PayloadAction<TConstructorIngredient>) => {
+        if (action.payload.type === 'bun') {
+          state.bun = action.payload;
+        } else {
+          state.ingredients.push(action.payload);
+        }
+      },
+      prepare: (ingredient: TIngredient) => ({
+        payload: {
+          ...ingredient,
           constructorId: crypto.randomUUID()
-        } as TConstructorIngredient);
-      }
+        }
+      })
     },
     removeIngredient: (state, action: PayloadAction<number>) => {
       state.ingredients.splice(action.payload, 1);
