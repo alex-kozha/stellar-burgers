@@ -1,6 +1,0 @@
-{
-  "success": true,
-  "accessToken": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNDE4MjFhNmExNzJkMDAxYjk4ZTU5ZiIsImlhdCI6MTc4MjY4MDQ2MywiZXhwIjoxNzgyNjgxNjYzfQ.c8GkNY2gpML7IPjQy31LNyBQ5acoKbWZJSHB4GfNfnk",
-  "refreshToken": "b8b30e9eefcc70a07ab8c47f43f05fe5b60b9ea658e6dc64c48eca03081a5f864fea11b076fe7f75",
-  "user": { "email": "abcc@gmail.com", "name": "sanek" }
-}

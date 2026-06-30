@@ -1,53 +1,33 @@
-import { test, expect } from '@playwright/test';
+ import { test, expect } from '@playwright/test';
 
-const MOCK_TOKEN = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNDE4MjFhNmExNzJkMDAxYjk4ZTU5ZiIsImlhdCI6MTc4MjY4MTE1NCwiZXhwIjoxNzgyNjgyMzU0fQ.tnBie5mCpNCKr2iZ_vFpyjR7q0Pz6p3HRrkWdEHBGbw';
+const MOCK_TOKEN = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNDExODQxNmExNzJkMDAxYjk4ZTRmZiIsImlhdCI6MTc4MjgyNTg0MSwiZXhwIjoxNzgyODI3MDQxfQ.STQd3881jr3Jwb2mYlqKiJYTteiuxRCwy4UUxs70yUc';
 
 test.describe('конструктор тесты', () => {
   test.beforeEach(async ({ page }) => {
-
     await page.routeFromHAR('./tests/hars/ingredients.har', {
       url: '**/api/ingredients',
       update: false
     });
 
-  
-    await page.route('**/api/auth/user', async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          success: true,
-          user: {
-            email: 'test@test.com',
-            name: 'Test User'
-          }
-        })
-      });
+    await page.routeFromHAR('./tests/hars/user.har', {
+      url: '**/api/auth/user',
+      update: false
     });
 
-    await page.route('**/api/orders', async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          success: true,
-          order: {
-            number: 12345
-          }
-        })
-      });
+    await page.routeFromHAR('./tests/hars/order.har', {
+      url: '**/api/orders',
+      update: false
     });
 
-   
+
     await page.addInitScript((token) => {
       localStorage.setItem('accessToken', token);
     }, MOCK_TOKEN);
 
-    
+
     await page.goto('http://localhost:4000');
     await page.waitForSelector('[data-testid="ingredient-card"]', { timeout: 10000 });
   });
-
   test('добавление ингредиента (начинки)', async ({ page }) => {
     const ingredientCard = page.locator('[data-testid="ingredient-card"]').filter({ hasText: 'Соус Spicy-X' });
     await expect(ingredientCard).toBeVisible({ timeout: 5000 });
@@ -119,7 +99,7 @@ test.describe('конструктор тесты', () => {
     
     const orderModal = page.locator('[data-testid="order-modal"]');
     await expect(orderModal).toBeVisible({ timeout: 15000 });
-    await expect(orderModal).toContainText(/[0-9]+/);
+    await expect(orderModal).toContainText('107428');
 
    
     const constructorItems = page.locator('[data-testid="constructor-item"]');
